@@ -13,13 +13,14 @@ from . import options
 
 from .general_items import cartridge_items, cartridge_item_group
 
-from .games import barbuta, porgy, vainger, night_manor, party_house, divers
+from .games import barbuta, porgy, vainger, night_manor, party_house, divers, grimstone
 from .games.barbuta import items, locations, regions
 from .games.porgy import items, locations, regions
 from .games.vainger import items, locations, regions
 from .games.night_manor import items, locations, regions
 from .games.party_house import items, locations, regions
 from .games.divers import items, locations, regions
+from .games.grimstone import items, locations, regions
 
 
 def launch_client(*args: str):
@@ -91,6 +92,7 @@ ufo50_games: dict = {
     "Night Manor": night_manor,
     "Party House": party_house,
     "Divers": divers,
+    "Grimstone": grimstone,
 }
 
 allowable_unimplemented: set[str] = {"Ninpek", "Magic Garden", "Velgress", "Waldorf's Journey"}
