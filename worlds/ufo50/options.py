@@ -184,7 +184,24 @@ class DiversCashItem(Range):
     display_name = "Divers - Cash Multiplier Items"
     range_end = 5
 
+#Grimstone
+class GrimstoneXpItem(Range):
+    """
+    Choose how many XP multipliers will be items
+    Each XP multiplier multiplies XP from enemies by 2
+    """
+    internal_name = "grimstone_xp_item"
+    display_name = "Grimstone - XP Multiplier Items"
+    range_end = 4
 
+class GrimstoneCashItem(Range):
+    """
+    Choose how many Cash multipliers will be items
+    Each Cash multiplier multiplies Cash from enemies by 2
+    """
+    internal_name = "grimstone_cash_item"
+    display_name = "Grimstone - Cash Multiplier Items"
+    range_end = 4
 
 @dataclass
 class UFO50Options(PerGameCommonOptions):
@@ -207,7 +224,9 @@ class UFO50Options(PerGameCommonOptions):
     divers_lever_check: DiversLeverCheck
     divers_xp_item: DiversXpItem
     divers_cash_item: DiversCashItem
-
+  
+    grimstone_xp_item: GrimstoneXpItem
+    grimstone_cash_item: GrimstoneCashItem
 
 ufo50_option_groups = [
     OptionGroup("General Options", [
@@ -232,5 +251,9 @@ ufo50_option_groups = [
         DiversLeverCheck,
         DiversXpItem,
         DiversCashItem,
+    ]),
+OptionGroup("Grimstone Options", [
+        GrimstoneXpItem,
+        GrimstoneCashItem,
     ])
 ]
