@@ -184,6 +184,34 @@ class DiversCashItem(Range):
     display_name = "Divers - Cash Multiplier Items"
     range_end = 5
 
+#Golfaria
+class GolfariaStartWithBrakes(Toggle):
+    """
+    If Enabled, the player will start with Brakes
+    """
+    internal_name = "golfaria_start_brakes"
+    display_name = "Golfaria - Start With Brakes"
+
+class GolfariaDifficulty(Range):
+    """
+    Difficulty setting for routing, affects logic
+    1 = easy, 2 = medium, 3 = hard
+    """
+    internal_name = "golfaria_difficulty"
+    display_name = "Golfaria - Difficulty"
+    range_start = 1
+    range_end = 3
+    default = 1
+
+class GolfariaHandicap(Range):
+    """
+    Difficulty setting for amount of strokes, affects logic
+    1 = 10%, 2 = 20% etc.
+    """
+    internal_name = "golfaria_handicap"
+    display_name = "Golfaria - Handicap"
+    range_end = 5
+
 #Grimstone
 class GrimstoneXpItem(Range):
     """
@@ -224,7 +252,11 @@ class UFO50Options(PerGameCommonOptions):
     divers_lever_check: DiversLeverCheck
     divers_xp_item: DiversXpItem
     divers_cash_item: DiversCashItem
-  
+
+    golfaria_start_brakes: GolfariaStartWithBrakes
+    golfaria_difficulty: GolfariaDifficulty
+    golfaria_handicap: GolfariaHandicap
+
     grimstone_xp_item: GrimstoneXpItem
     grimstone_cash_item: GrimstoneCashItem
 
@@ -255,5 +287,10 @@ ufo50_option_groups = [
 OptionGroup("Grimstone Options", [
         GrimstoneXpItem,
         GrimstoneCashItem,
+    ]),
+    OptionGroup("Golfaria Options", [
+        GolfariaStartWithBrakes,
+        GolfariaDifficulty,
+        GolfariaHandicap,
     ])
 ]
