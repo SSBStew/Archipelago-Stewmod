@@ -10,7 +10,7 @@ class AlwaysOnGames(OptionSet):
     """
     Choose which games you would like to enable.
 
-    The following games have full implementations: Barbuta, Vainger, Night Manor, Divers, and Porgy.
+    The following games have full implementations: Barbuta, Vainger, Night Manor, Divers, Grimstone, Golfaria and Porgy.
     Party House has a more minor implementation, and counts as an implemented game.
     There is a host.yaml setting that you must enable to include unimplemented games.
     Unimplemented games will only have Garden, Gold, and/or Cherry checks.
