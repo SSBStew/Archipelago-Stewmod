@@ -15,6 +15,9 @@ class ItemInfo(NamedTuple):
 
 item_table: dict[str, ItemInfo] = {
     "Club": ItemInfo(0, IC.progression, 20),
+    "Scorecard": ItemInfo(1, IC.filler, 0),
+    "Pencil": ItemInfo(2, IC.filler, 0),
+    "Driver": ItemInfo(3, IC.filler, 0),
     "Parbot": ItemInfo(20, IC.filler, 10),
     "Tee 1": ItemInfo(30, IC.progression, 1),
     "Tee 2": ItemInfo(31, IC.progression, 1),
@@ -77,4 +80,4 @@ def create_items(world: "UFO50World") -> list[Item]:
 
 
 def get_filler_item_name(world: "UFO50World") -> str:
-    return "Golfaria - Club"
+    return world.random.choice(["Golfaria - Scorecard", "Golfaria - Pencil", "Golfaria - Driver"])
