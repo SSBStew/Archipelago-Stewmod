@@ -28,6 +28,9 @@ def create_rules(world: "UFO50World", regions: dict[str, Region]) -> None:
     haswater = rules.Has(water)
     hassand = rules.Has(sand)
     hasblock = rules.Has(block)
+    hastee = rules.Has("Golfaria - Tee 1") & rules.Has("Golfaria - Tee 2") & rules.Has("Golfaria - Tee 3") & rules.Has("Golfaria - Tee 4")
+    hasnpc = rules.Has("Golfaria - Temple North NPC") & rules.Has("Golfaria - Temple East NPC") & rules.Has("Golfaria - Desert Cave NPC") & rules.Has("Golfaria - Water Save Cave NPC") & rules.Has("Golfaria - Water Cave NPC") & rules.Has("Golfaria - Lake Center NPC") & rules.Has("Golfaria - Im Lost NPC") & rules.Has("Golfaria - Sandman NPC")
+    hasparbot = rules.Has(club, count=10)
     wise = rules.Has("Golfaria - Wise Ball's Cave Checkpoint") & rules.CanReachLocation("Golfaria - Wise Ball's Cave Checkpoint Location")
     calm = rules.Has("Golfaria - Calm Cave Checkpoint") & rules.CanReachLocation("Golfaria - Calm Cave Checkpoint Location")
     gur = rules.Has("Golfaria - Gur Grotto Checkpoint") & rules.CanReachLocation("Golfaria - Gur Grotto Checkpoint Location")
@@ -57,8 +60,13 @@ def create_rules(world: "UFO50World", regions: dict[str, Region]) -> None:
     start.connect(forest)
     start.connect(islands)
     start.connect(regions["Water"])
-    temple.connect(boss,
-                  rule=lambda state: state.has("Golfaria - Tee 1", player) and state.has("Golfaria - Tee 2", player) and state.has("Golfaria - Tee 3", player) and state.has("Golfaria - Tee 4", player) and state.has(block, player) and state.has(water, player) and state.has(sand, player) and has_brakes(state, world))
+    clubsneeded = rules.Has(club, count=math.ceil(((53 * handicap) - 20) / 3))
+    temprule = hasbrakes & hasblock & hassand & haswater & hastee & clubsneeded
+    world.create_entrance(temple, boss, temprule)
+    clubsneeded = rules.Has(club, count=20)
+    temprule = hasbrakes & hasblock & hassand & haswater & hastee & hasparbot & hasnpc & clubsneeded
+    if "Golfaria" in world.options.cherry_allowed_games:
+        world.set_rule(world.get_location("Golfaria - Cherry"), temprule)
     if difficulty == 1:
         world.set_rule(world.get_location("Golfaria - Calm Cave Checkpoint Location"), hasbrakes)
         world.set_rule(world.get_location("Golfaria - Gur Grotto Checkpoint Location"), hasbrakes)
@@ -126,7 +134,7 @@ def create_rules(world: "UFO50World", regions: dict[str, Region]) -> None:
         clubsneeded = rules.Has(club, count=math.ceil(((22 * handicap) - 20) / 3))
         clubsneeded2 = rules.Has(club, count=math.ceil(((15 * handicap) - 20) / 3))
         temprule = hasbrakes & hasblock & clubsneeded
-        temprule2 = cave & caverule4 & hasbrakes & hasblock & clubsneeded2
+        temprule2 = cave & hasbrakes & hasblock & clubsneeded2
         temprule3 = temprule | temprule2
         world.set_rule(world.get_location("Golfaria - Crumbling Cut Tee"), temprule3)
         clubsneeded = rules.Has(club, count=math.ceil(((18 * handicap) - 20) / 3))
@@ -198,7 +206,7 @@ def create_rules(world: "UFO50World", regions: dict[str, Region]) -> None:
         temprule3 = calm & hasbrakes & clubsneeded3
         temprule4 = calm & hasblock & clubsneeded4
         temprule5 = gur & hasbrakes & clubsneeded5
-        temprule6 = cave & caverule4 & hasbrakes
+        temprule6 = cave & hasbrakes
         temprule7 = temprule | temprule2 | temprule3 | temprule4 | temprule5 | temprule6
         world.set_rule(world.get_location("Golfaria - Driver Depths Club"), temprule7)
         clubsneeded = rules.Has(club, count=math.ceil(((34 * handicap) - 20) / 3))
@@ -222,7 +230,7 @@ def create_rules(world: "UFO50World", regions: dict[str, Region]) -> None:
         temprule2 = hasbrakes & hasblock
         temprule3 = calm & hasbrakes & clubsneeded3
         temprule4 = gur & hasbrakes & clubsneeded4
-        temprule5 = cave & caverule4 & hasbrakes
+        temprule5 = cave & hasbrakes
         temprule6 = temprule | temprule2 | temprule3 | temprule4 | temprule5
         world.set_rule(world.get_location("Golfaria - Mt Driver Parbot"), temprule6)
         clubsneeded = rules.Has(club, count=math.ceil(((20 * handicap) - 20) / 3))
@@ -327,9 +335,11 @@ def create_rules(world: "UFO50World", regions: dict[str, Region]) -> None:
         clubsneeded = rules.Has(club, count=math.ceil(((22 * handicap) - 20) / 3))
         clubsneeded2 = rules.Has(club, count=math.ceil(((15 * handicap) - 20) / 3))
         temprule = hasbrakes & hasblock & clubsneeded
-        temprule2 = cave & caverule4 & hasbrakes & hasblock & clubsneeded2
+        temprule2 = cave & hasbrakes & hasblock & clubsneeded2
         temprule3 = temprule | temprule2
         world.set_rule(world.get_location("Golfaria - Crumbling Cut Tee"), temprule3)
+        temprule = haswater
+        world.set_rule(world.get_location("Golfaria - Water-Wedge Way Tee"), temprule)
         world.set_rule(world.get_location("Golfaria - Sandy Subterra Tee"), hasbrakes)
         clubsneeded = rules.Has(club, count=math.ceil(((15 * handicap) - 20) / 3))
         temprule = hasbrakes & haswater & clubsneeded
@@ -384,7 +394,7 @@ def create_rules(world: "UFO50World", regions: dict[str, Region]) -> None:
         temprule3 = calm & hasbrakes & clubsneeded3
         temprule4 = calm & hasblock & clubsneeded4
         temprule5 = gur & hasbrakes & clubsneeded5
-        temprule6 = cave & caverule4 & hasbrakes
+        temprule6 = cave & hasbrakes
         temprule7 = temprule | temprule2 | temprule3 | temprule4 | temprule5 | temprule6
         world.set_rule(world.get_location("Golfaria - Driver Depths Club"), temprule7)
         clubsneeded2 = rules.Has(club, count=math.ceil(((40 * handicap) - 20) / 3))
@@ -407,7 +417,7 @@ def create_rules(world: "UFO50World", regions: dict[str, Region]) -> None:
         temprule2 = hasbrakes & hasblock
         temprule3 = calm & hasbrakes & clubsneeded3
         temprule4 = gur & hasbrakes & clubsneeded4
-        temprule5 = cave & caverule4 & hasbrakes
+        temprule5 = cave & hasbrakes
         temprule6 = temprule | temprule2 | temprule3 | temprule4 | temprule5
         world.set_rule(world.get_location("Golfaria - Mt Driver Parbot"), temprule6)
         clubsneeded = rules.Has(club, count=math.ceil(((20 * handicap) - 20) / 3))
@@ -521,9 +531,11 @@ def create_rules(world: "UFO50World", regions: dict[str, Region]) -> None:
         clubsneeded = rules.Has(club, count=math.ceil(((22 * handicap) - 20) / 3))
         clubsneeded2 = rules.Has(club, count=math.ceil(((15 * handicap) - 20) / 3))
         temprule = hasbrakes & hasblock & clubsneeded
-        temprule2 = cave & caverule4 & hasbrakes & hasblock & clubsneeded2
+        temprule2 = cave & hasbrakes & hasblock & clubsneeded2
         temprule3 = temprule | temprule2
         world.set_rule(world.get_location("Golfaria - Crumbling Cut Tee"), temprule3)
+        temprule = haswater
+        world.set_rule(world.get_location("Golfaria - Water-Wedge Way Tee"), temprule)
         world.set_rule(world.get_location("Golfaria - Sandy Subterra Tee"), hasbrakes)
         clubsneeded = rules.Has(club, count=math.ceil(((15 * handicap) - 20) / 3))
         temprule = hasbrakes & haswater & clubsneeded
@@ -575,7 +587,7 @@ def create_rules(world: "UFO50World", regions: dict[str, Region]) -> None:
         temprule3 = calm & hasbrakes & clubsneeded3
         temprule4 = calm & hasblock & clubsneeded4
         temprule5 = gur & hasbrakes & clubsneeded5
-        temprule6 = cave & caverule4 & hasbrakes
+        temprule6 = cave & hasbrakes
         temprule7 = temprule | temprule2 | temprule3 | temprule4 | temprule5 | temprule6
         world.set_rule(world.get_location("Golfaria - Driver Depths Club"), temprule7)
         clubsneeded2 = rules.Has(club, count=math.ceil(((30 * handicap) - 20) / 3))
@@ -598,7 +610,7 @@ def create_rules(world: "UFO50World", regions: dict[str, Region]) -> None:
         temprule2 = hasbrakes & hasblock
         temprule3 = calm & hasbrakes & clubsneeded3
         temprule4 = gur & hasbrakes & clubsneeded4
-        temprule5 = cave & caverule4 & hasbrakes
+        temprule5 = cave & hasbrakes
         temprule6 = temprule | temprule2 | temprule3 | temprule4 | temprule5
         world.set_rule(world.get_location("Golfaria - Mt Driver Parbot"), temprule6)
         clubsneeded = rules.Has(club, count=math.ceil(((20 * handicap) - 20) / 3))
@@ -640,5 +652,50 @@ def create_rules(world: "UFO50World", regions: dict[str, Region]) -> None:
         temprule = hasbrakes & hassand
         temprule2 = clubsneeded2
         temprule3 = temprule | temprule2
-        world.set_rule(world.get_location("Golfaria - Sandy Sinkhole B NPC"), temprule)
+        world.set_rule(world.get_location("Golfaria - Sandy Sinkhole B NPC"), temprule3)
+        world.set_rule(world.get_location("Golfaria - Ocean Pit NPC"), haswater)
+    if difficulty == 4:
+        temprule = hasbrakes & hasblock
+        world.set_rule(world.get_location("Golfaria - Tee Temple Checkpoint Location"), temprule)
+        temprule = hasbrakes | hasblock
+        world.set_rule(world.get_location("Golfaria - Cave Town Checkpoint Location"), temprule)
+        world.set_rule(world.get_location("Golfaria - Winding Wetway Checkpoint Location"), hasbrakes)
+        temprule = hasbrakes & hassand
+        world.set_rule(world.get_location("Golfaria - Bunker Below Checkpoint Location"), temprule)
+        world.set_rule(world.get_location("Golfaria - Block Buster Location"), hasbrakes)
+        world.set_rule(world.get_location("Golfaria - Garden"), hasbrakes)
+        temprule = hasbrakes & haswater
+        world.set_rule(world.get_location("Golfaria - Sand Roll Location"), temprule)
+        temprule = hasbrakes & hassand
+        world.set_rule(world.get_location("Golfaria - Water Roll Location"), temprule)
+        temprule = hasbrakes & hasblock
+        world.set_rule(world.get_location("Golfaria - Crumbling Cut Tee"), temprule)
+        world.set_rule(world.get_location("Golfaria - Water-Wedge Way Tee"), haswater)
+        world.set_rule(world.get_location("Golfaria - Sandy Subterra Tee"), hasbrakes)
+        temprule = hasbrakes & haswater
+        world.set_rule(world.get_location("Golfaria - Tee Temple Tee"), temprule)
+        world.set_rule(world.get_location("Golfaria - Underputt Club 2"), haswater)
+        world.set_rule(world.get_location("Golfaria - Gritty Grip Grotto Club"), hassand)
+        world.set_rule(world.get_location("Golfaria - Moebius Hole Club"), hasblock)
+        world.set_rule(world.get_location("Golfaria - Rooted Route Blocked Club"), hasblock)
+        world.set_rule(world.get_location("Golfaria - Rooted Route Water Roll Club"), haswater)
+        world.set_rule(world.get_location("Golfaria - Tee Temple Club 1"), hasbrakes)
+        world.set_rule(world.get_location("Golfaria - Tee Temple Club 2"), hasbrakes)
+        temprule = hasbrakes & hasblock
+        world.set_rule(world.get_location("Golfaria - Mulligan Caverns Club"), temprule)
+        temprule = hasbrakes | hasblock
+        world.set_rule(world.get_location("Golfaria - Driver Depths Club"), temprule)
+        temprule = hasbrakes & haswater
+        world.set_rule(world.get_location("Golfaria - Winding Wetway Club"), temprule)
+        world.set_rule(world.get_location("Golfaria - Mt Driver Parbot"), hasbrakes)
+        world.set_rule(world.get_location("Golfaria - Bunker Dunes Parbot 2"), hasbrakes)
+        world.set_rule(world.get_location("Golfaria - Up And Down Isle Parbot"), hasbrakes)
+        world.set_rule(world.get_location("Golfaria - Arc Archipelago Parbot"), haswater)
+        world.set_rule(world.get_location("Golfaria - Underputt Parbot"), haswater)
+        temprule = hasblock & haswater
+        world.set_rule(world.get_location("Golfaria - Up N Over Cove NPC"), temprule)
+        temprule = hasbrakes & haswater
+        world.set_rule(world.get_location("Golfaria - Winding Wetway NPC"), temprule)
+        world.set_rule(world.get_location("Golfaria - East Temple NPC"), hasbrakes)
+        world.set_rule(world.get_location("Golfaria - Sandy Subterra NPC"), hasbrakes)
         world.set_rule(world.get_location("Golfaria - Ocean Pit NPC"), haswater)
