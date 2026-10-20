@@ -326,7 +326,7 @@ class UFO50World(World):
         self.multiworld.itempool += created_items
 
     # games where the filler is a nothing item, so let's just exclude these where we can
-    bad_filler_games: set[str] = {"Night Manor"}
+    bad_filler_games: set[str] = {"Night Manor", "Golfaria"}
 
     def get_filler_item_name(self) -> str:
         if not self.included_games:
