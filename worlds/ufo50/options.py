@@ -195,12 +195,16 @@ class GolfariaStartWithBrakes(Toggle):
 class GolfariaDifficulty(Range):
     """
     Difficulty setting for routing, affects logic
-    1 = easy, 2 = medium, 3 = hard
+    1 = easy, 2 = medium, 3 = hard, 4 = hardcore
+    In hardcore difficulty, you can only save at
+    the waking cave checkpoint and collecting
+    clubs doesn't increase your max strokes until
+    the last boss.
     """
     internal_name = "golfaria_difficulty"
     display_name = "Golfaria - Difficulty"
     range_start = 1
-    range_end = 3
+    range_end = 4
     default = 1
 
 class GolfariaHandicap(Range):
