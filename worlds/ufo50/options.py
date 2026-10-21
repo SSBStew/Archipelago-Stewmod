@@ -159,13 +159,6 @@ class NMEarlyPin(DefaultOnToggle):
     display_name = "Night Manor - Early Hairpin"
 
 #Divers
-class DiversLeverCheck(Toggle):
-    """
-    If enabled, the levers will be locations and items
-    """
-    internal_name = "divers_lever_check"
-    display_name = "Divers - Are Levers Checks"
-
 class DiversXpItem(Range):
     """
     Choose how many XP multipliers will be items
@@ -253,7 +246,6 @@ class UFO50Options(PerGameCommonOptions):
 
     nm_early_pin: NMEarlyPin
 
-    divers_lever_check: DiversLeverCheck
     divers_xp_item: DiversXpItem
     divers_cash_item: DiversCashItem
 
@@ -284,7 +276,6 @@ ufo50_option_groups = [
         NMEarlyPin,
     ]),
     OptionGroup("Divers Options", [
-        DiversLeverCheck,
         DiversXpItem,
         DiversCashItem,
     ]),
