@@ -173,7 +173,6 @@ class UFO50World(World):
                 self.options.porgy_check_on_touch.value = self.ut_passthrough[options.PorgyCheckOnTouch.internal_name]
                 self.options.porgy_radar.value = self.ut_passthrough[options.PorgyRadar.internal_name]
                 self.options.porgy_lanternless.value = self.ut_passthrough[options.PorgyLanternless.internal_name]
-                self.options.divers_lever_check.value = self.ut_passthrough[options.DiversLeverCheck.internal_name]
                 self.options.golfaria_start_brakes.value = self.ut_passthrough[options.GolfariaStartWithBrakes.internal_name]
                 self.options.golfaria_difficulty.value = self.ut_passthrough[options.GolfariaDifficulty.internal_name]
                 self.options.golfaria_handicap.value = self.ut_passthrough[options.GolfariaHandicap.internal_name]
@@ -350,7 +349,6 @@ class UFO50World(World):
             options.PorgyCheckOnTouch.internal_name: self.options.porgy_check_on_touch.value,
             options.PorgyRadar.internal_name: self.options.porgy_radar.value,
             options.PorgyLanternless.internal_name: self.options.porgy_lanternless.value,
-            options.DiversLeverCheck.internal_name: self.options.divers_lever_check.value,
             options.GolfariaStartWithBrakes.internal_name: self.options.golfaria_start_brakes.value,
             options.GolfariaDifficulty.internal_name: self.options.golfaria_difficulty.value,
             options.GolfariaHandicap.internal_name: self.options.golfaria_handicap.value,
