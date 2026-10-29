@@ -16,31 +16,31 @@ class ItemInfo(NamedTuple):
 
 item_table: dict[str, ItemInfo] = {
     #Weapons
-    "Slime Stick": ItemInfo(0, IC.filler, 0, "Weapons"),
-    "Slime Lance": ItemInfo(1, IC.filler, 1, "Weapons"),
+    "Slime Stick": ItemInfo(0, IC.filler, 1, "Weapons"),
+    "Slime Lance": ItemInfo(1, IC.progression, 1, "Weapons"),
     "Slime Trident": ItemInfo(2, IC.progression, 1, "Weapons"),
-    "Shell Stick": ItemInfo(3, IC.filler, 0, "Weapons"),
-    "Shell Lance": ItemInfo(4, IC.filler, 1, "Weapons"),
+    "Shell Stick": ItemInfo(3, IC.filler, 1, "Weapons"),
+    "Shell Lance": ItemInfo(4, IC.progression, 1, "Weapons"),
     "Shell Trident": ItemInfo(5, IC.progression, 1, "Weapons"),
-    "Elec Stick": ItemInfo(6, IC.filler, 0, "Weapons"),
-    "Elec Lance": ItemInfo(7, IC.filler, 1, "Weapons"),
+    "Elec Stick": ItemInfo(6, IC.filler, 1, "Weapons"),
+    "Elec Lance": ItemInfo(7, IC.progression, 1, "Weapons"),
     "Elec Trident": ItemInfo(8, IC.progression, 1, "Weapons"),
     "Holy Rod": ItemInfo(9, IC.progression, 1, "Weapons"),
-    "Slime Mallet": ItemInfo(20, IC.filler, 0, "Weapons"),
+    "Slime Mallet": ItemInfo(20, IC.filler, 1, "Weapons"),
     "Slime Sledge": ItemInfo(21, IC.progression, 1, "Weapons"),
-    "Shell Mallet": ItemInfo(22, IC.filler, 0, "Weapons"),
+    "Shell Mallet": ItemInfo(22, IC.filler, 1, "Weapons"),
     "Shell Sledge": ItemInfo(23, IC.progression, 1, "Weapons"),
-    "Elec Mallet": ItemInfo(24, IC.filler, 0, "Weapons"),
+    "Elec Mallet": ItemInfo(24, IC.filler, 1, "Weapons"),
     "Elec Sledge": ItemInfo(25, IC.progression, 1, "Weapons"),
     "Parasite Hammer": ItemInfo(26, IC.progression, 1, "Weapons"),
-    "Slime Lid": ItemInfo(40, IC.filler, 0, "Weapons"),
-    "Slime Buckler": ItemInfo(41, IC.filler, 1, "Weapons"),
+    "Slime Lid": ItemInfo(40, IC.filler, 1, "Weapons"),
+    "Slime Buckler": ItemInfo(41, IC.progression, 1, "Weapons"),
     "Slime Tower": ItemInfo(42, IC.progression, 1, "Weapons"),
-    "Shell Lid": ItemInfo(43, IC.filler, 0, "Weapons"),
-    "Shell Buckler": ItemInfo(44, IC.filler, 1, "Weapons"),
+    "Shell Lid": ItemInfo(43, IC.filler, 1, "Weapons"),
+    "Shell Buckler": ItemInfo(44, IC.progression, 1, "Weapons"),
     "Shell Tower": ItemInfo(45, IC.progression, 1, "Weapons"),
-    "Elec Lid": ItemInfo(46, IC.filler, 0, "Weapons"),
-    "Elec Buckler": ItemInfo(47, IC.filler, 1, "Weapons"),
+    "Elec Lid": ItemInfo(46, IC.filler, 1, "Weapons"),
+    "Elec Buckler": ItemInfo(47, IC.progression, 1, "Weapons"),
     "Elec Tower": ItemInfo(48, IC.progression, 1, "Weapons"),
     "Thorn Shield": ItemInfo(49, IC.progression, 1, "Weapons"),
     #Potions
@@ -53,7 +53,7 @@ item_table: dict[str, ItemInfo] = {
     #Key
     "Bomb": ItemInfo(80, IC.progression, 1, "Key"),
     "Mist Orb": ItemInfo(81, IC.progression, 1, "Key"),
-    "Flippers": ItemInfo(82, IC.useful, 1, "Key"),
+    "Flippers": ItemInfo(82, IC.progression, 1, "Key"),
     "Godblood": ItemInfo(83, IC.filler, 1, "Key"),
     #XP/gold multiplier
     "Progressive Cash Mult": ItemInfo(90, IC.useful, 0, "Bonus"),
@@ -67,12 +67,12 @@ item_table: dict[str, ItemInfo] = {
     "Ruins Southeast Gate": ItemInfo(105, IC.progression, 1, "Key"),
     "Ruins Southwest Gate": ItemInfo(106, IC.progression, 1, "Key"),
     #relics
-    "3 Fisheye": ItemInfo(110, IC.filler, 1, "Relic"),
-    "3 Residue": ItemInfo(111, IC.filler, 1, "Relic"),
-    "3 Roe": ItemInfo(112, IC.filler, 1, "Relic"),
-    "3 Ingot": ItemInfo(113, IC.filler, 1, "Relic"),
-    "3 Scale": ItemInfo(114, IC.filler, 1, "Relic"),
-    "3 Cross": ItemInfo(115, IC.filler, 1, "Relic"),
+    "Fisheye": ItemInfo(110, IC.filler, 1, "Relic"),
+    "Residue": ItemInfo(111, IC.filler, 1, "Relic"),
+    "Roe": ItemInfo(112, IC.filler, 1, "Relic"),
+    "Ingot": ItemInfo(113, IC.filler, 1, "Relic"),
+    "Scale": ItemInfo(114, IC.filler, 1, "Relic"),
+    "Cross": ItemInfo(115, IC.filler, 1, "Relic"),
     "500 Cash": ItemInfo(118, IC.filler, 1, "Relic"),
     #A relic is given by the ruins boss
     "A relic": ItemInfo(116, IC.filler, 0, "Relic"),
@@ -148,12 +148,12 @@ def get_item_groups() -> dict[str, set[str]]:
             "Divers - Progressive Cash Mult",
             "Divers - Progressive XP Mult"},
         "Divers - Relic": {
-            "Divers - 3 Fisheye",
-            "Divers - 3 Residue",
-            "Divers - 3 Roe",
-            "Divers - 3 Ingot",
-            "Divers - 3 Scale",
-            "Divers - 3 Cross",
+            "Divers - Fisheye",
+            "Divers - Residue",
+            "Divers - Roe",
+            "Divers - Ingot",
+            "Divers - Scale",
+            "Divers - Cross",
             "Divers - 500 Cash",
             "Divers - A Relic",
             "Divers - B Relic"},
@@ -185,6 +185,8 @@ def create_items(world: "UFO50World") -> list[Item]:
     items_to_create: dict[str, int] = {item_name: data.quantity for item_name, data in item_table.items()}
     items_to_create["Progressive Cash Mult"] = cash_item
     items_to_create["Progressive XP Mult"] = xp_item
+    if world.options.divers_start_flippers:
+        items_to_create["Flippers"] = 0
     divers_items: list[Item] = []
     for item_name, quantity in items_to_create.items():
         for _ in range(quantity):
@@ -193,4 +195,4 @@ def create_items(world: "UFO50World") -> list[Item]:
 
 
 def get_filler_item_name(world: "UFO50World") -> str:
-    return world.random.choice(["Divers - 3 Fisheye", "Divers - 3 Residue", "Divers - 3 Roe", "Divers - 3 Ingot", "Divers - 3 Scale", "Divers - 3 Cross", "Divers - 500 Cash"])
+    return world.random.choice(["Divers - Fisheye", "Divers - Residue", "Divers - Roe", "Divers - Ingot", "Divers - Scale", "Divers - Cross", "Divers - 500 Cash"])
