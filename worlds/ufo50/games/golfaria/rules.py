@@ -10,11 +10,6 @@ if TYPE_CHECKING:
 
 brakes = "Golfaria - Brakes"
 
-def has_brakes(state: CollectionState, world: "UFO50World") -> bool:
-    if GolfariaStartWithBrakes or state.has(brakes, world.player):
-        return True
-    else:
-        return False
 
 def create_rules(world: "UFO50World", regions: dict[str, Region]) -> None:
     player = world.player
@@ -655,47 +650,64 @@ def create_rules(world: "UFO50World", regions: dict[str, Region]) -> None:
         world.set_rule(world.get_location("Golfaria - Sandy Sinkhole B NPC"), temprule3)
         world.set_rule(world.get_location("Golfaria - Ocean Pit NPC"), haswater)
     if difficulty == 4:
+        strokes = world.options.golfaria_hardcore_strokes
         temprule = hasbrakes & hasblock
         world.set_rule(world.get_location("Golfaria - Tee Temple Checkpoint Location"), temprule)
-        temprule = hasbrakes | hasblock
-        world.set_rule(world.get_location("Golfaria - Cave Town Checkpoint Location"), temprule)
-        world.set_rule(world.get_location("Golfaria - Winding Wetway Checkpoint Location"), hasbrakes)
-        temprule = hasbrakes & hassand
+        temprule = hasbrakes & rules.Has(club, count=15 - strokes)
+        temprule2 = temprule | hasblock
+        world.set_rule(world.get_location("Golfaria - Cave Town Checkpoint Location"), temprule2)
+        temprule = hasbrakes & rules.Has(club, count=15 - strokes)
+        world.set_rule(world.get_location("Golfaria - Winding Wetway Checkpoint Location"), temprule)
+        temprule = hasbrakes & hassand & rules.Has(club, count=19 - strokes)
         world.set_rule(world.get_location("Golfaria - Bunker Below Checkpoint Location"), temprule)
-        world.set_rule(world.get_location("Golfaria - Block Buster Location"), hasbrakes)
-        world.set_rule(world.get_location("Golfaria - Garden"), hasbrakes)
-        temprule = hasbrakes & haswater
+        world.set_rule(world.get_location("Golfaria - Brakes Location"), rules.Has(club, count=6))
+        temprule = hasbrakes & rules.Has(club, count=16 - strokes)
+        world.set_rule(world.get_location("Golfaria - Block Buster Location"), temprule)
+        world.set_rule(world.get_location("Golfaria - Garden"), temprule)
+        temprule = hasbrakes & haswater & rules.Has(club, count=17 - strokes)
         world.set_rule(world.get_location("Golfaria - Sand Roll Location"), temprule)
-        temprule = hasbrakes & hassand
+        temprule = hasbrakes & hassand & rules.Has(club, count=15 - strokes)
         world.set_rule(world.get_location("Golfaria - Water Roll Location"), temprule)
-        temprule = hasbrakes & hasblock
+        temprule = hasbrakes & hasblock & rules.Has(club, count=18 - strokes)
         world.set_rule(world.get_location("Golfaria - Crumbling Cut Tee"), temprule)
-        world.set_rule(world.get_location("Golfaria - Water-Wedge Way Tee"), haswater)
+        temprule = haswater & rules.Has(club, count=13 - strokes)
+        world.set_rule(world.get_location("Golfaria - Water-Wedge Way Tee"), temprule)
         world.set_rule(world.get_location("Golfaria - Sandy Subterra Tee"), hasbrakes)
-        temprule = hasbrakes & haswater
+        temprule = hasbrakes & haswater & rules.Has(club, count=14 - strokes)
         world.set_rule(world.get_location("Golfaria - Tee Temple Tee"), temprule)
         world.set_rule(world.get_location("Golfaria - Underputt Club 2"), haswater)
+        world.set_rule(world.get_location("Golfaria - Downswing Dip Club"), rules.Has(club, count=11 - strokes))
+        world.set_rule(world.get_location("Golfaria - Up N Over Cove Club"), rules.Has(club, count=18 - strokes))
         world.set_rule(world.get_location("Golfaria - Gritty Grip Grotto Club"), hassand)
         world.set_rule(world.get_location("Golfaria - Moebius Hole Club"), hasblock)
         world.set_rule(world.get_location("Golfaria - Rooted Route Blocked Club"), hasblock)
         world.set_rule(world.get_location("Golfaria - Rooted Route Water Roll Club"), haswater)
         world.set_rule(world.get_location("Golfaria - Tee Temple Club 1"), hasbrakes)
-        world.set_rule(world.get_location("Golfaria - Tee Temple Club 2"), hasbrakes)
-        temprule = hasbrakes & hasblock
+        temprule = hasbrakes & rules.Has(club, count=13 - strokes)
+        world.set_rule(world.get_location("Golfaria - Tee Temple Club 2"), temprule)
+        temprule = hasbrakes & hasblock & rules.Has(club, count=18 - strokes)
         world.set_rule(world.get_location("Golfaria - Mulligan Caverns Club"), temprule)
-        temprule = hasbrakes | hasblock
-        world.set_rule(world.get_location("Golfaria - Driver Depths Club"), temprule)
-        temprule = hasbrakes & haswater
+        temprule = hasbrakes & rules.Has(club, count=15 - strokes)
+        temprule2 = temprule | hasblock
+        world.set_rule(world.get_location("Golfaria - Driver Depths Club"), temprule2)
+        temprule = hasbrakes & haswater & rules.Has(club, count=11 - strokes)
         world.set_rule(world.get_location("Golfaria - Winding Wetway Club"), temprule)
-        world.set_rule(world.get_location("Golfaria - Mt Driver Parbot"), hasbrakes)
-        world.set_rule(world.get_location("Golfaria - Bunker Dunes Parbot 2"), hasbrakes)
-        world.set_rule(world.get_location("Golfaria - Up And Down Isle Parbot"), hasbrakes)
-        world.set_rule(world.get_location("Golfaria - Arc Archipelago Parbot"), haswater)
+        world.set_rule(world.get_location("Golfaria - West Green Parbot"), rules.Has(club, count=11 - strokes))
+        temprule = hasbrakes & rules.Has(club, count=14 - strokes)
+        world.set_rule(world.get_location("Golfaria - Mt Driver Parbot"), temprule)
+        temprule = hasbrakes & rules.Has(club, count=17 - strokes)
+        world.set_rule(world.get_location("Golfaria - Bunker Dunes Parbot 2"), temprule)
+        temprule = hasbrakes & rules.Has(club, count=18 - strokes)
+        world.set_rule(world.get_location("Golfaria - Up And Down Isle Parbot"), temprule)
+        temprule = haswater & rules.Has(club, count=11 - strokes)
+        world.set_rule(world.get_location("Golfaria - Arc Archipelago Parbot"), temprule)
         world.set_rule(world.get_location("Golfaria - Underputt Parbot"), haswater)
-        temprule = hasblock & haswater
+        temprule = hasblock & haswater & rules.Has(club, count=15 - strokes)
         world.set_rule(world.get_location("Golfaria - Up N Over Cove NPC"), temprule)
-        temprule = hasbrakes & haswater
+        temprule = hasbrakes & haswater & rules.Has(club, count=11 - strokes)
         world.set_rule(world.get_location("Golfaria - Winding Wetway NPC"), temprule)
         world.set_rule(world.get_location("Golfaria - East Temple NPC"), hasbrakes)
         world.set_rule(world.get_location("Golfaria - Sandy Subterra NPC"), hasbrakes)
-        world.set_rule(world.get_location("Golfaria - Ocean Pit NPC"), haswater)
+        world.set_rule(world.get_location("Golfaria - Sandy Sinkhole B NPC"), rules.Has(club, count=19 - strokes))
+        temprule = haswater & rules.Has(club, count=11 - strokes)
+        world.set_rule(world.get_location("Golfaria - Ocean Pit NPC"), temprule)
