@@ -18,7 +18,7 @@ item_table: dict[str, ItemInfo] = {
     "Scorecard": ItemInfo(1, IC.filler, 0),
     "Pencil": ItemInfo(2, IC.filler, 0),
     "Driver": ItemInfo(3, IC.filler, 0),
-    "Parbot": ItemInfo(20, IC.filler, 10),
+    "Parbot": ItemInfo(20, IC.progression, 10),
     "Tee 1": ItemInfo(30, IC.progression, 1),
     "Tee 2": ItemInfo(31, IC.progression, 1),
     "Tee 3": ItemInfo(32, IC.progression, 1),
@@ -54,6 +54,38 @@ def get_items() -> dict[str, int]:
 # this should return the item groups for this game, independent of yaml options
 def get_item_groups() -> dict[str, set[str]]:
     item_groups: dict[str, set[str]] = {"Golfaria": {f"Golfaria - {item_name}" for item_name in item_table.keys()}}
+    item_groups.update({
+        "Golfaria - Powerups": {
+            "Golfaria - Club",
+            "Golfaria - Brakes",
+            "Golfaria - Block Buster",
+            "Golfaria - Water Roll",
+            "Golfaria - Sand Roll"},
+        "Golfaria - Checkpoints": {
+            "Golfaria - Wise Ball's Cave Checkpoint",
+            "Golfaria - Calm Cave Checkpoint",
+            "Golfaria - Gur Grotto Checkpoint",
+            "Golfaria - Rooted Route Checkpoint",
+            "Golfaria - Tee Temple Checkpoint",
+            "Golfaria - Cave Town Checkpoint",
+            "Golfaria - Downswing Dip Checkpoint",
+            "Golfaria - Winding Wetway Checkpoint",
+            "Golfaria - Bunker Below Checkpoint"},
+        "Golfaria - Tees": {
+            "Golfaria - Tee 1",
+            "Golfaria - Tee 2",
+            "Golfaria - Tee 3",
+            "Golfaria - Tee 4"},
+        "Golfaria - NPCs": {
+            "Golfaria - Temple North NPC",
+            "Golfaria - Temple East NPC",
+            "Golfaria - Desert Cave NPC",
+            "Golfaria - Water Save Cave NPC",
+            "Golfaria - Water Cave NPC",
+            "Golfaria - Lake Center NPC",
+            "Golfaria - Im Lost NPC",
+            "Golfaria - Sandman NPC"},
+    })
     return item_groups
 
 
