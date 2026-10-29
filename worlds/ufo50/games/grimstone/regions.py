@@ -12,13 +12,18 @@ if TYPE_CHECKING:
 regions: list[str] = [
     "Menu",
     "Pleasant",
+    "Pleasantshop",
     "Heston",
+    "Hestonshop",
     "Auster",
+    "Austershop",
     "Basement",
     "Pasaje",
     "Serpent",
     "Lawbuck",
+    "Lawbuckshop",
     "Tower",
+    "Agarthashop",
     "Boss",
 ]
 
