@@ -175,7 +175,7 @@ class UFO50World(World):
                 self.options.divers_start_flippers.value = self.ut_passthrough[options.DiversStartWithFlippers.internal_name]
                 self.options.divers_relic_mult.value = self.ut_passthrough[options.DiversRelicMult.internal_name]
                 self.options.divers_store_depth.value = self.ut_passthrough[options.DiversStoreDepth.internal_name]
-                self.options.divers_xp_item = self.ut_passthrough[options.DiversXpItem.internal_name]
+                self.options.divers_xp_item.value = self.ut_passthrough[options.DiversXpItem.internal_name]
                 self.options.divers_cash_item.value = self.ut_passthrough[options.DiversCashItem.internal_name]
                 self.options.grimstone_shops.value = self.ut_passthrough[options.GrimstoneShops.internal_name]
                 self.options.golfaria_start_brakes.value = self.ut_passthrough[options.GolfariaStartWithBrakes.internal_name]
@@ -360,6 +360,8 @@ class UFO50World(World):
             options.DiversStoreDepth.internal_name: self.options.divers_store_depth.value,
             options.DiversXp.internal_name: self.options.divers_xp.value,
             options.DiversCash.internal_name: self.options.divers_cash.value,
+            options.DiversXpItem.internal_name: self.options.divers_xp_item.value,
+            options.DiversCashItem.internal_name: self.options.divers_cash_item.value,
             options.DiversPearl.internal_name: self.options.divers_pearl.value,
             options.GrimstoneXp.internal_name: self.options.grimstone_xp.value,
             options.GrimstoneCash.internal_name: self.options.grimstone_cash.value,
