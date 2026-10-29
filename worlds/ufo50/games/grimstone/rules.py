@@ -40,6 +40,10 @@ def create_rules(world: "UFO50World", regions: dict[str, Region]) -> None:
                    rule=lambda state: state.has("Grimstone - HORSESHOE", player))
     tower.connect(boss,
                    rule=lambda state: state.has("Grimstone - HAMMER", player))
-
+    pleasant.connect(regions["Pleasantshop"])
+    heston.connect(regions["Hestonshop"])
+    auster.connect(regions["Austershop"])
+    lawbuck.connect(regions["Lawbuckshop"])
+    tower.connect(regions["Agarthashop"])
     set_rule(world.get_location("Grimstone - Calamity Location"),
              rule=lambda state: state.has(abyss, player))
