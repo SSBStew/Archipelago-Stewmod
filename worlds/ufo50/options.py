@@ -1,291 +1,381 @@
-from dataclasses import dataclass
+from typing import ClassVar, Any, Union
 
-from Options import (StartInventoryPool, Range, OptionSet, PerGameCommonOptions, OptionGroup, Choice, Toggle,
-                     DefaultOnToggle, Visibility)
+import Utils
+from BaseClasses import Tutorial, Region, Item, ItemClassification, Location
+from Options import OptionError
+from settings import Group, UserFilePath, LocalFolderPath, Bool
+from worlds.AutoWorld import World, WebWorld
+from worlds.generic.Rules import add_rule
+from worlds.LauncherComponents import components, Component, launch_subprocess, Type as ComponentType
 
-from .constants import game_ids
+from .constants import *
+from . import options
 
+from .general_items import cartridge_items, cartridge_item_group
 
-class AlwaysOnGames(OptionSet):
-    """
-    Choose which games you would like to enable.
-
-    The following games have full implementations: Barbuta, Vainger, Night Manor, Divers, Grimstone, Golfaria and Porgy.
-    Party House has a more minor implementation, and counts as an implemented game.
-    There is a host.yaml setting that you must enable to include unimplemented games.
-    Unimplemented games will only have Garden, Gold, and/or Cherry checks.
-    The host.yaml setting is not required for the following games due to their short length:
-    Ninpek, Magic Garden, Velgress, and Waldorf's Journey
-    """
-    internal_name = "always_on_games"
-    display_name = "Always On Games"
-    valid_keys = {game_name for game_name in game_ids.keys() if game_name != "Main Menu"}
-    # default is here so the unit tests don't fail
-    default = ["Barbuta"]
-
-
-class RandomChoiceGames(OptionSet):
-    """
-    Choose which games have a chance of being enabled.
-    The number of games that will be enabled is based on the Random Choice Game Count option.
-    """
-    internal_name = "random_choice_games"
-    display_name = "Random Choice Games"
-    valid_keys = {game_name for game_name in game_ids.keys() if game_name != "Main Menu"}
+from .games import barbuta, porgy, vainger, night_manor, party_house, divers, golfaria, grimstone
+from .games.barbuta import items, locations, regions
+from .games.porgy import items, locations, regions
+from .games.vainger import items, locations, regions
+from .games.night_manor import items, locations, regions
+from .games.party_house import items, locations, regions
+from .games.divers import items, locations, regions
+from .games.golfaria import items, locations, regions
+from .games.grimstone import items, locations, regions
 
 
-class RandomChoiceGameCount(Range):
-    """
-    Choose how many Random Choice Games will be included alongside your Always On Games.
-    If your Random Choice Game Count is larger than the number of games in your Random Choice Games list, all of them will be enabled.
-    """
-    internal_name = "random_choice_game_count"
-    display_name = "Random Choice Game Count"
-    range_start = 0
-    range_end = 50
-    default = 0
-    # this is super unnecessary to show in the spoiler, so just hide it
-    visibility = Visibility.template | Visibility.simple_ui | Visibility.complex_ui
+def launch_client(*args: str):
+    from .Client import launch
+    launch_subprocess(launch(*args), name=CLIENT_NAME)
 
 
-class StartingGameAmount(Range):
-    """
-    Choose how many games to have unlocked at the start.
-    At least one of the starting games will always be one of the implemented games, to avoid issues with generation and very early BK.
-    If this value is higher than the number of games you selected, you will start with all of them unlocked.
-    If you put a game in your start inventory from pool, it will count towards the amount from this option.
-    """
-    internal_name = "starting_game_amount"
-    display_name = "Starting Game Amount"
-    range_start = 1
-    range_end = 50
-    default = 1
+components.append(
+    Component(f"UFO 50", game_name="UFO 50", func=launch_client, component_type=ComponentType.CLIENT,
+              supports_uri=True)
+)
 
 
-class GoalGames(OptionSet):
-    """
-    Choose which games you may have to complete to achieve your goal.
-    """
-    internal_name = "goal_games"
-    display_name = "Goal Games"
-    valid_keys = {game_name for game_name in game_ids.keys() if game_name != "Main Menu"}
-    default = {game_name for game_name in game_ids.keys() if game_name != "Main Menu"}
+class UFO50Settings(Group):
+    class GamePath(UserFilePath):
+        """Path to the game executable"""
+        is_exe = True
+
+    class InstallFolder(LocalFolderPath):
+        """Path to the mod installation folder"""
+        description = "the folder to install UFO 50 Archipelago to (do not select vanilla UFO 50 folder)"
+
+    class LaunchGame(Bool):
+        """Set this to false to never autostart the game"""
+
+    class LaunchCommand(str):
+        """
+        The console command that will be used to launch the game
+        The command will be executed with the installation folder as the current directory
+        """
+
+    class AllowUnimplemented (Bool):
+        """
+        Allow the player to choose unimplemented games.
+        These games will only send checks when the player does the Garden, Gold, or Cherry checks.
+        This can cause issues because the time per check is much higher than normal, and some games are very long.
+        """
+
+    exe_path: GamePath = GamePath("ufo50.exe")
+    install_folder: InstallFolder = InstallFolder("UFO 50")
+    launch_game: Union[LaunchGame, bool] = True
+    launch_command: LaunchCommand = LaunchCommand("ufo50.exe" if Utils.is_windows
+                                                  else "wine ufo50.exe")
+    allow_unimplemented: Union[AllowUnimplemented, bool] = False
 
 
-class GoalGameAmount(Range):
-    """
-    Choose how many games you need to goal to achieve your goal among your Goal Games.
-    If this number is less than the number of Goal Games you have selected, it will choose some of them at random to be your Goal Games.
-    If this number is greater than or equal to your number of Goal Games, then all of your games will be your Goal Games.
-    """
-    internal_name = "goal_game_amount"
-    display_name = "Goal Game Amount"
-    range_start = 1
-    range_end = 50
-    default = 50
-    # this is super unnecessary to show in the spoiler, so just hide it
-    visibility = Visibility.template | Visibility.simple_ui | Visibility.complex_ui
+class UFO50Web(WebWorld):
+    theme = "partyTime"
+    bug_report_page = "https://github.com/UFO-50-Archipelago/Archipelago/issues"
+    setup_en = Tutorial(
+        "Multiworld Setup Guide",
+        "A guide to setting up UFO 50 for Archipelago multiworld.",
+        "English",
+        "setup_en.md",
+        "setup/en",
+        ["LeonarthCG"]
+    )
+    tutorials = [setup_en]
+    option_groups = options.ufo50_option_groups
 
 
-class CherryAllowed(OptionSet):
-    """
-    Choose which games you want to include the Cherry goal in.
-    If the game is set as your Goal Game, then you will need to Cherry that game to complete that goal.
-    If the game is not set as a Goal Game, then Cherrying that game will be a check.
-    If the game is not selected at all, then this option will not affect it.
-    The defaults are ones where we believe the Cherry goal is reasonable in the context of a randomizer.
-    """
-    internal_name = "cherry_allowed_games"
-    display_name = "Cherry-Allowed Games"
-    valid_keys = {game_name for game_name in game_ids.keys() if game_name != "Main Menu"}
-    # include the games where it makes sense to be Cherry by default
-    default = {"Barbuta", "Night Manor"}
+# games with an actual implementation
+# add to this list as part of your PR
+# try to keep them in the same order as on the main menu
+ufo50_games: dict = {
+    "Barbuta": barbuta,
+    "Golfaria": golfaria,
+    "Porgy": porgy,
+    "Party House": party_house,
+    "Divers": divers,
+    "Vainger": vainger,
+    "Grimstone": grimstone,
+    "Night Manor": night_manor,
+}
+
+allowable_unimplemented: set[str] = {"Ninpek", "Magic Garden", "Velgress", "Waldorf's Journey"}
 
 
-class PorgyFuelDifficulty(Choice):
-    """
-    Determine how much fuel you need to get checks.
-    Hard means an efficient route with minimal damage.
-    Medium means 25% more fuel than Hard.
-    Easy means 50% more fuel than Hard.
-    """
-    internal_name = "porgy_fuel_difficulty"
-    display_name = "Porgy - Fuel Difficulty"
-    option_easy = 0
-    option_medium = 1
-    option_hard = 2
-    default = 1
+# for the purpose of generically making the gift, gold, and cherry locations
+unimplemented_ufo50_games: list[str] = [name for name in game_ids.keys() if name not in ufo50_games.keys()]
+
+# doing something like this in the world class itself led to weird errors
+temp_ufo50_location_name_to_id = {k: v for game in ufo50_games.values() for k, v in game.locations.get_locations().items()}
+for game in unimplemented_ufo50_games:
+    base_id = get_game_base_id(game)
+    temp_ufo50_location_name_to_id[f"{game} - Garden"] = base_id + 997
+    temp_ufo50_location_name_to_id[f"{game} - Gold"] = base_id + 998
+    temp_ufo50_location_name_to_id[f"{game} - Cherry"] = base_id + 999
 
 
-class PorgyCheckOnTouch(Toggle):
-    """
-    If enabled, you will check a location as soon as you touch it, rather than having to bring it back.
-    For a shorter, quicker experience.
-    """
-    internal_name = "porgy_check_on_touch"
-    display_name = "Porgy - Check on Touch"
+class UFO50World(World):
+    """ 
+    UFO 50 is a collection of 50 single and multiplayer games from the creators of Spelunky, Downwell, Air Land & Sea,
+    Skorpulac, Catacomb Kids, and Madhouse.
+    Jump in and explore a variety of genres, from platformers and shoot 'em ups to puzzle games and RPGs.
+    Their goal is to combine a familiar 8-bit aesthetic with new ideas and modern game design sensibilities.
+    """  # Excerpt from https://50games.fun/
+    game = GAME_NAME
+    web = UFO50Web()
+    required_client_version = (0, 5, 0)
+    topology_present = False
 
+    item_name_to_id = {k: v for game in ufo50_games.values() for k, v in game.items.get_items().items()}
+    item_name_to_id.update(cartridge_items)
+    item_name_to_id.update({"Intentional Nothing Filler Item": base_id - 100})
+    location_name_to_id = temp_ufo50_location_name_to_id
 
-class PorgyRadar(Choice):
-    """
-    Choose how the Radar System and its logic behave.
-    Always On: The Radar System is always on without needing to equip it or receive it.
-    Not Required: The Radar System is not logically required for concealed locations.
-    Required: The Radar System is logically required for all concealed locations.
-    Required No Tell: The Radar System is logically required for concealed locations without a visual cue.
-    """
-    internal_name = "porgy_radar"
-    display_name = "Porgy - Radar Logic"
-    option_always_on = 0
-    option_not_required = 1
-    option_required = 2
-    option_required_no_tell = 3
-    default = 2
+    item_name_groups = {k: v for game in ufo50_games.values() for k, v in game.items.get_item_groups().items()}
+    item_name_groups.update(cartridge_item_group)
+    location_name_groups = {k: v for game in ufo50_games.values() for k, v in game.locations.get_location_groups().items()}
 
+    options_dataclass = options.UFO50Options
+    options: options.UFO50Options
+    settings_key = "ufo_50_settings"
+    settings: ClassVar[UFO50Settings]
 
-class PorgyLanternless(Toggle):
-    """
-    If enabled, you will not logically require the Spotlight in the Abyss area.
-    """
-    internal_name = "porgy_lanternless"
-    display_name = "Porgy - Lanternless"
+    # for universal tracker support
+    using_ut: bool
+    ut_passthrough: dict[str, Any]
+    ut_can_gen_without_yaml = True  # class var that tells it to ignore the player yaml
 
-# Night Manor
-class NMEarlyPin(DefaultOnToggle):
-    """
-    If enabled, the Hairpin will be on the floor in the starting room on either the Bowl or Spoon checks.
-    """
-    internal_name = "nm_early_pin"
-    display_name = "Night Manor - Early Hairpin"
+    included_games: list[str]  # list of games that are going to be played by this player
+    included_unimplemented_games: list[str]  # list of included unimplemented games being played by this player
 
-#Divers
-class DiversXpItem(Range):
-    """
-    Choose how many XP multipliers will be items
-    Each XP multiplier multiplies XP from enemies by 2
-    """
-    internal_name = "divers_xp_item"
-    display_name = "Divers - XP Multiplier Items"
-    range_end = 4
+    starting_games: list[str]  # the games you start with unlocked
+    goal_games: list[str]  # the games that are your goals
 
-class DiversCashItem(Range):
-    """
-    Choose how many Cash multipliers will be items
-    Each Cash multiplier multiplies Cash from enemies by 2
-    """
-    internal_name = "divers_cash_item"
-    display_name = "Divers - Cash Multiplier Items"
-    range_end = 5
+    porgy_lantern_and_radar_slots_req: dict[str, int]
 
-#Golfaria
-class GolfariaStartWithBrakes(Toggle):
-    """
-    If Enabled, the player will start with Brakes
-    """
-    internal_name = "golfaria_start_brakes"
-    display_name = "Golfaria - Start With Brakes"
+    def generate_early(self) -> None:
+        if not self.player_name.isascii():
+            raise OptionError(f"{self.player_name}'s name must be only ASCII.")
 
-class GolfariaDifficulty(Range):
-    """
-    Difficulty setting for routing, affects logic
-    1 = easy, 2 = medium, 3 = hard, 4 = hardcore
-    In hardcore difficulty, you can only save at
-    the waking cave checkpoint and collecting
-    clubs doesn't increase your max strokes until
-    the last boss.
-    """
-    internal_name = "golfaria_difficulty"
-    display_name = "Golfaria - Difficulty"
-    range_start = 1
-    range_end = 4
-    default = 1
+        # for universal tracker support
+        if hasattr(self.multiworld, "re_gen_passthrough"):
+            if "UFO 50" in self.multiworld.re_gen_passthrough:
+                self.ut_passthrough = self.multiworld.re_gen_passthrough["UFO 50"]
+                # sets the games that ended up on as the always_on_games, turns off random_choice_games
+                id_to_game = {v: k for k, v in game_ids.items()}
+                self.options.always_on_games.value = {id_to_game[game_id] for game_id in self.ut_passthrough["included_games"]}
+                self.options.random_choice_games.value.clear()
+                self.options.random_choice_game_count.value = 0
+                self.options.goal_games.value = {id_to_game[game_id] for game_id in self.ut_passthrough["goal_games"]}
+                self.options.goal_game_amount.value = 50
+                # UT doesn't show locations that aren't actually in your slot, so this is fine
+                self.options.cherry_allowed_games.value = {game_name for game_name in game_ids.keys()}
+                self.options.porgy_fuel_difficulty.value = self.ut_passthrough[options.PorgyFuelDifficulty.internal_name]
+                self.options.porgy_check_on_touch.value = self.ut_passthrough[options.PorgyCheckOnTouch.internal_name]
+                self.options.porgy_radar.value = self.ut_passthrough[options.PorgyRadar.internal_name]
+                self.options.porgy_lanternless.value = self.ut_passthrough[options.PorgyLanternless.internal_name]
+                self.options.divers_start_flippers.value = self.ut_passthrough[options.DiversStartWithFlippers.internal_name]
+                self.options.divers_relic_mult.value = self.ut_passthrough[options.DiversRelicMult.internal_name]
+                self.options.divers_store_depth.value = self.ut_passthrough[options.DiversStoreDepth.internal_name]
+                self.options.divers_xp_item = self.ut_passthrough[options.DiversXpItem.internal_name]
+                self.options.divers_cash_item.value = self.ut_passthrough[options.DiversCashItem.internal_name]
+                self.options.grimstone_shops.value = self.ut_passthrough[options.GrimstoneShops.internal_name]
+                self.options.golfaria_start_brakes.value = self.ut_passthrough[options.GolfariaStartWithBrakes.internal_name]
+                self.options.golfaria_difficulty.value = self.ut_passthrough[options.GolfariaDifficulty.internal_name]
+                self.options.golfaria_handicap.value = self.ut_passthrough[options.GolfariaHandicap.internal_name]
+                self.options.golfaria_hardcore_strokes.value = self.ut_passthrough[options.GolfariaHardcoreStrokes.internal_name]
 
-class GolfariaHandicap(Range):
-    """
-    Difficulty setting for amount of strokes, affects logic
-    1 = 10%, 2 = 20% etc.
-    """
-    internal_name = "golfaria_handicap"
-    display_name = "Golfaria - Handicap"
-    range_end = 5
+        included_game_names = sorted(self.options.always_on_games.value)
+        # exclude always on games from random choice games
+        maybe_games = sorted(self.options.random_choice_games.value - self.options.always_on_games.value)
+        # if the number of games you want is higher than the number of games you chose, enable all chosen
+        if self.options.random_choice_game_count >= len(maybe_games):
+            included_game_names += maybe_games
+        elif self.options.random_choice_game_count and maybe_games:
+            included_game_names += self.random.sample(maybe_games, self.options.random_choice_game_count.value)
 
-#Grimstone
-class GrimstoneXpItem(Range):
-    """
-    Choose how many XP multipliers will be items
-    Each XP multiplier multiplies XP from enemies by 2
-    """
-    internal_name = "grimstone_xp_item"
-    display_name = "Grimstone - XP Multiplier Items"
-    range_end = 4
+        if not included_game_names:
+            raise OptionError(f"UFO 50: {self.player_name} has not selected any games.")
 
-class GrimstoneCashItem(Range):
-    """
-    Choose how many Cash multipliers will be items
-    Each Cash multiplier multiplies Cash from enemies by 2
-    """
-    internal_name = "grimstone_cash_item"
-    display_name = "Grimstone - Cash Multiplier Items"
-    range_end = 4
+        self.included_games = []
+        self.included_unimplemented_games = []
+        for game_name in included_game_names:
+            if game_name in ufo50_games.keys():
+                self.included_games.append(game_name)
+            else:
+                self.included_unimplemented_games.append(game_name)
 
-@dataclass
-class UFO50Options(PerGameCommonOptions):
-    start_inventory_from_pool: StartInventoryPool
-    always_on_games: AlwaysOnGames
-    random_choice_games: RandomChoiceGames
-    random_choice_game_count: RandomChoiceGameCount
-    starting_game_amount: StartingGameAmount
-    goal_games: GoalGames
-    goal_game_amount: GoalGameAmount
-    cherry_allowed_games: CherryAllowed
+        if self.included_unimplemented_games and not self.settings.allow_unimplemented:
+            for game_name in self.included_unimplemented_games:
+                if game_name in allowable_unimplemented:
+                    break
+            else:
+                raise OptionError(f"UFO 50: {self.player_name} has selected an unimplemented game, but the host "
+                                  f"does not have them enabled. Please enable the host.yaml setting or remove the "
+                                  f"unimplemented games from the selected games.\n"
+                                  f"Unimplemented games: {self.included_unimplemented_games}")
 
-    porgy_fuel_difficulty: PorgyFuelDifficulty
-    porgy_check_on_touch: PorgyCheckOnTouch
-    porgy_radar: PorgyRadar
-    porgy_lanternless: PorgyLanternless
+        if not self.included_games and not self.settings.allow_unimplemented:
+            for game_name in self.included_unimplemented_games:
+                if game_name in allowable_unimplemented:
+                    break
+            else:
+                raise OptionError(f"UFO 50: {self.player_name} has not selected any games that have implementations. "
+                                  f"Please select at least one game that has an actual implementation, or have the "
+                                  f"host enable the host.yaml setting to allow them.\n"
+                                  f"The following games have actual implementations: {[name for name in ufo50_games]}")
+        self.options.goal_games.value = [game_name for game_name in self.options.goal_games if game_name in included_game_names]
+        potential_goal_games = [game_name for game_name in included_game_names if game_name in self.options.goal_games]
+        if self.options.goal_game_amount >= len(potential_goal_games):
+            self.goal_games = potential_goal_games
+        else:
+            self.goal_games = self.random.choices(potential_goal_games, k=self.options.goal_game_amount.value)
 
-    nm_early_pin: NMEarlyPin
+    def create_regions(self) -> None:
+        menu = Region("Menu", self.player, self.multiworld)
+        self.multiworld.regions.append(menu)
 
-    divers_xp_item: DiversXpItem
-    divers_cash_item: DiversCashItem
+        victory_location = Location(self.player, "Completed All Games", None, menu)
+        victory_location.place_locked_item(Item("Victory", ItemClassification.progression, None, self.player))
+        self.multiworld.completion_condition[self.player] = lambda state: state.has("Victory", self.player)
+        menu.locations.append(victory_location)
 
-    golfaria_start_brakes: GolfariaStartWithBrakes
-    golfaria_difficulty: GolfariaDifficulty
-    golfaria_handicap: GolfariaHandicap
+        for game_name in self.goal_games:
+            string_end = " - Gold"
+            if game_name in self.options.cherry_allowed_games:
+                string_end = " - Cherry"
+            add_rule(victory_location, lambda state: state.can_reach_location(game_name + string_end, self.player))
 
-    grimstone_xp_item: GrimstoneXpItem
-    grimstone_cash_item: GrimstoneCashItem
+        for game_name in self.included_games:
+            game = ufo50_games[game_name]
+            game_regions = game.regions.create_regions_and_rules(self)
+            for region in game_regions.values():
+                self.multiworld.regions.append(region)
+            game_menu = self.get_region(f"{game.game_name} - Menu")
+            menu.connect(game_menu, f"Boot {game.game_name}",
+                         rule=lambda state, name=game.game_name: state.has(f"{name} Cartridge", self.player))
 
-ufo50_option_groups = [
-    OptionGroup("General Options", [
-        AlwaysOnGames,
-        RandomChoiceGames,
-        RandomChoiceGameCount,
-        StartingGameAmount,
-        GoalGames,
-        GoalGameAmount,
-        CherryAllowed,
-    ]),
-    OptionGroup("Porgy Options", [
-        PorgyFuelDifficulty,
-        PorgyCheckOnTouch,
-        PorgyRadar,
-        PorgyLanternless,
-    ]),
-    OptionGroup("Night Manor Options", [
-        NMEarlyPin,
-    ]),
-    OptionGroup("Divers Options", [
-        DiversXpItem,
-        DiversCashItem,
-    ]),
-OptionGroup("Grimstone Options", [
-        GrimstoneXpItem,
-        GrimstoneCashItem,
-    ]),
-    OptionGroup("Golfaria Options", [
-        GolfariaStartWithBrakes,
-        GolfariaDifficulty,
-        GolfariaHandicap,
-    ])
-]
+        for game_name in self.included_unimplemented_games:
+            locs = {
+                f"{game_name} - Garden": self.location_name_to_id[f"{game_name} - Garden"],
+                f"{game_name} - Gold": self.location_name_to_id[f"{game_name} - Gold"],
+            }
+            if game_name in self.options.cherry_allowed_games:
+                locs[f"{game_name} - Cherry"] = self.location_name_to_id[f"{game_name} - Cherry"]
+            region = Region(f"{game_name} Region", self.player, self.multiworld)
+            region.add_locations(locs)
+            menu.connect(region, f"Boot {game_name}",
+                         rule=lambda state, name=game_name: state.has(f"{name} Cartridge", self.player))
+
+    def create_item(self, name: str, item_class: ItemClassification = None) -> Item:
+        # figure out which game it's from and call its create_item
+        game_name = name.split(" - ", 1)[0]
+        if game_name in ufo50_games:
+            return ufo50_games[game_name].items.create_item(name, self, item_class)
+        if name.endswith("Cartridge"):
+            item_class = item_class or ItemClassification.progression
+        return Item(name, item_class or ItemClassification.filler, self.item_name_to_id[name], self.player)
+
+    def create_items(self) -> None:
+        created_items: list[Item] = []
+        for game_name in self.included_games:
+            game = ufo50_games[game_name]
+            created_items += game.items.create_items(self)
+
+        included_game_names = self.included_games + self.included_unimplemented_games
+        # check precollected items for cartridges, add them to the starting games list
+        precollected_cartridges = set()
+        self.starting_games = []
+        for item in self.multiworld.precollected_items[self.player]:
+            if item.name.endswith("Cartridge"):
+                game_name = item.name.split(" Cartridge")[0]
+                if game_name not in self.starting_games and game_name in included_game_names:
+                    self.starting_games.append(game_name)
+                    precollected_cartridges.add(game_name)
+
+        # if your starting game amount is higher than included games, then they're all starting games
+        if self.options.starting_game_amount >= len(included_game_names):
+            self.starting_games = included_game_names
+        else:
+            addtl_games_to_start_with = max(self.options.starting_game_amount.value - len(self.starting_games), 0)
+            self.starting_games += self.random.choices(
+                [game for game in included_game_names if game not in self.starting_games],
+                k=addtl_games_to_start_with)
+            for game_name in self.starting_games:
+                if game_name in ufo50_games.keys():
+                    break
+            else:
+                # remove a game, add an implemented game, unless none are implemented
+                # since we're popping, we don't need to worry about removing a precollected cartridge
+                if self.included_games and addtl_games_to_start_with > 0:
+                    self.starting_games.pop()
+                    self.starting_games.append(self.random.choice(self.included_games))
+
+        all_games = self.included_games + self.included_unimplemented_games
+        for game_name in all_games:
+            cartridge = self.create_item(f"{game_name} Cartridge",
+                                         ItemClassification.progression | ItemClassification.useful)
+            if game_name in self.starting_games and game_name not in precollected_cartridges:
+                self.multiworld.push_precollected(cartridge)
+            else:
+                created_items.append(cartridge)
+
+        unfilled_locations = self.multiworld.get_unfilled_locations(self.player)
+        extra_items_needed = len(unfilled_locations) - len(created_items)
+
+        # debug, delete this later once it all works nicely
+        if extra_items_needed < 0:
+            raise Exception("Too many items for the number of games, need to fix this somehow.")
+
+        for _ in range(extra_items_needed):
+            created_items.append(self.create_item(self.get_filler_item_name(), ItemClassification.filler))
+
+        self.multiworld.itempool += created_items
+
+    # games where the filler is a nothing item, so let's just exclude these where we can
+    bad_filler_games: set[str] = {"Night Manor", "Golfaria"}
+
+    def get_filler_item_name(self) -> str:
+        if not self.included_games:
+            return "Intentional Nothing Filler Item"
+        good_filler_item_games = [game for game in self.included_games if game not in self.bad_filler_games]
+        if not good_filler_item_games:
+            good_filler_item_games = self.included_games
+        return ufo50_games[self.random.choice(good_filler_item_games)].items.get_filler_item_name(self)
+
+    def fill_slot_data(self) -> dict[str, Any]:
+        included_games = [game_ids[game_name] for game_name in self.included_games]
+        included_games += [game_ids[game_name] for game_name in self.included_unimplemented_games]
+        goal_games = [game_ids[game_name] for game_name in self.goal_games]
+        cherry_games = [game_ids[game_name] for game_name in self.goal_games
+                        if game_name in self.options.cherry_allowed_games]
+        slot_data = {
+            "included_games": included_games,
+            "goal_games": goal_games,
+            "cherry_games": cherry_games,
+            options.PorgyFuelDifficulty.internal_name: self.options.porgy_fuel_difficulty.value,
+            options.PorgyCheckOnTouch.internal_name: self.options.porgy_check_on_touch.value,
+            options.PorgyRadar.internal_name: self.options.porgy_radar.value,
+            options.PorgyLanternless.internal_name: self.options.porgy_lanternless.value,
+            options.DiversStartWithFlippers.internal_name: self.options.divers_start_flippers.value,
+            options.DiversRelicMult.internal_name: self.options.divers_relic_mult.value,
+            options.DiversStoreDepth.internal_name: self.options.divers_store_depth.value,
+            options.DiversXp.internal_name: self.options.divers_xp.value,
+            options.DiversCash.internal_name: self.options.divers_cash.value,
+            options.DiversPearl.internal_name: self.options.divers_pearl.value,
+            options.GrimstoneXp.internal_name: self.options.grimstone_xp.value,
+            options.GrimstoneCash.internal_name: self.options.grimstone_cash.value,
+            options.GrimstoneShops.internal_name: self.options.grimstone_shops.value,
+            options.GrimstoneRandomCharacters.internal_name: self.options.grimstone_random_characters.value,
+            options.GrimstoneDuplicateCharacters.internal_name: self.options.grimstone_duplicate_characters.value,
+            options.GolfariaStartWithBrakes.internal_name: self.options.golfaria_start_brakes.value,
+            options.GolfariaDifficulty.internal_name: self.options.golfaria_difficulty.value,
+            options.GolfariaHandicap.internal_name: self.options.golfaria_handicap.value,
+            options.GolfariaHardcoreStrokes.internal_name: self.options.golfaria_hardcore_strokes.value,
+        }
+        return slot_data
+
+    # for the universal tracker, doesn't get called in standard gen
+    # docs: https://github.com/FarisTheAncient/Archipelago/blob/tracker/worlds/tracker/docs/re-gen-passthrough.md
+    @staticmethod
+    def interpret_slot_data(slot_data: dict[str, Any]) -> dict[str, Any]:
+        # returning slot_data so it regens, giving it back in multiworld.re_gen_passthrough
+        return slot_data
