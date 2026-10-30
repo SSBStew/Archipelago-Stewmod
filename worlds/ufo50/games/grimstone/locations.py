@@ -156,7 +156,7 @@ location_table: dict[str, LocationInfo] = {
     "Black Tower 4F Boss": LocationInfo(411, "Tower"),
 #doesn't work    "Final Boss": LocationInfo(412, "Boss"),
     "Auster Boss": LocationInfo(414, "Auster"),
-    "Smugglers Pass Boss": LocationInfo(418, "Pleasant"),
+    "Smugglers Pass Boss": LocationInfo(418, "Serpent"),
     "Black Citadel Boss 1": LocationInfo(420, "Boss"),
     "Pleasant Shop 1": LocationInfo(501, "Pleasantshop"),
     "Pleasant Shop 2": LocationInfo(502, "Pleasantshop"),
