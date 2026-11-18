@@ -13,7 +13,7 @@ from . import options
 
 from .general_items import cartridge_items, cartridge_item_group
 
-from .games import barbuta, porgy, vainger, night_manor, party_house, divers, golfaria, grimstone
+from .games import barbuta, porgy, vainger, night_manor, party_house, divers, golfaria, grimstone, overbold
 from .games.barbuta import items, locations, regions
 from .games.porgy import items, locations, regions
 from .games.vainger import items, locations, regions
@@ -22,6 +22,7 @@ from .games.party_house import items, locations, regions
 from .games.divers import items, locations, regions
 from .games.golfaria import items, locations, regions
 from .games.grimstone import items, locations, regions
+from .games.overbold import items, locations, regions
 
 
 def launch_client(*args: str):
@@ -93,6 +94,7 @@ ufo50_games: dict = {
     "Party House": party_house,
     "Divers": divers,
     "Vainger": vainger,
+    "Overbold": overbold,
     "Grimstone": grimstone,
     "Night Manor": night_manor,
 }
