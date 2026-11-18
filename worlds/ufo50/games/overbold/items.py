@@ -16,25 +16,25 @@ class ItemInfo(NamedTuple):
 
 item_table: dict[str, ItemInfo] = {
     #Gear
-    "Extra HP": ItemInfo(0, IC.progression, 1, "gear"),
-    "Medkits": ItemInfo(1, IC.progression, 1, "gear"),
-    "Blast Shield": ItemInfo(2, IC.progression, 1, "gear"),
-    "Projectile Shield": ItemInfo(3, IC.progression, 1, "gear"),
-    "Faster Shooting": ItemInfo(4, IC.progression, 1, "gear"),
-    "Power Shot": ItemInfo(5, IC.progression, 1, "gear"),
-    "Spread Shot": ItemInfo(6, IC.progression, 1, "gear"),
-    "Bounce Shot": ItemInfo(7, IC.progression, 1, "gear"),
-    "Push Shot": ItemInfo(8, IC.progression, 1, "gear"),
-    "Drone": ItemInfo(9, IC.progression, 1, "gear"),
-    "Lava Walk": ItemInfo(10, IC.progression, 1, "gear"),
-    "Dash Attack": ItemInfo(11, IC.progression, 1, "gear"),
-    "Extra Bombs": ItemInfo(12, IC.progression, 1, "gear"),
-    "Remote Detonator": ItemInfo(13, IC.progression, 1, "gear"),
-    "Shrapnel Bombs": ItemInfo(14, IC.progression, 1, "gear"),
-    "Bomb Lure": ItemInfo(15, IC.progression, 1, "gear"),
+    "Extra HP": ItemInfo(0, IC.progression, 1, "Gear"),
+    "Medkits": ItemInfo(1, IC.progression, 1, "Gear"),
+    "Blast Shield": ItemInfo(2, IC.progression, 1, "Gear"),
+    "Projectile Shield": ItemInfo(3, IC.progression, 1, "Gear"),
+    "Faster Shooting": ItemInfo(4, IC.progression, 1, "Gear"),
+    "Power Shot": ItemInfo(5, IC.progression, 1, "Gear"),
+    "Spread Shot": ItemInfo(6, IC.progression, 1, "Gear"),
+    "Bounce Shot": ItemInfo(7, IC.progression, 1, "Gear"),
+    "Push Shot": ItemInfo(8, IC.progression, 1, "Gear"),
+    "Drone": ItemInfo(9, IC.progression, 1, "Gear"),
+    "Lava Walk": ItemInfo(10, IC.progression, 1, "Gear"),
+    "Dash Attack": ItemInfo(11, IC.progression, 1, "Gear"),
+    "Extra Bombs": ItemInfo(12, IC.progression, 1, "Gear"),
+    "Remote Detonator": ItemInfo(13, IC.progression, 1, "Gear"),
+    "Shrapnel Bombs": ItemInfo(14, IC.progression, 1, "Gear"),
+    "Bomb Lure": ItemInfo(15, IC.progression, 1, "Gear"),
     #Other
-    "Starting Bomb": ItemInfo(20, IC.filler, 3, "other"),
-    "Better Sales": ItemInfo(21, IC.filler, 1, "other"),
+    "Starting Bomb": ItemInfo(20, IC.filler, 3, "Other"),
+    "Better Sales": ItemInfo(21, IC.filler, 1, "Other"),
 }
 
 
